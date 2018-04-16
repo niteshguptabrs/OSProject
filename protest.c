@@ -9,7 +9,39 @@ struct p_manager
 int pid;
 int b;
 }t[4700];
+void allocate_map();
+void allocate();
+void release();
+void *display_thread(void *n)
+{
+int i=*(int *)n;
+int k,p;
+k=allocate();
+pthread_mutex_lock(&mutex);
+p=pno;
+sleep(5);
+printf("\nProcess : %d || PID = %d \n",pno++,k);
+pthread_mutex_unlock(&mutex);
+sleep(5);
+release(k,p);
+}
 
+int main()
+{
+int n,i;
+allocate_map();
+printf("Enter the number of process to start");
+scanf("%d",&n);
+pthread_t p[n];
+for(i=0;i<n;i++)
+{
+ pthread_create(&p[i],NULL,display_thread,(void *)&n);
+}
+for(i=0;i<n;i++)
+{pthread_join(p[i],NULL);
+}
+return 0; 
+}
 void allocate_map()
 {
 int i,id=MIN_PID;
@@ -43,34 +75,4 @@ int allocate()
     }
 
     return 0;
-}
-void *display_thread(void *n)
-{
-int i=*(int *)n;
-int k,p;
-k=allocate();
-pthread_mutex_lock(&mutex);
-p=pno;
-sleep(5);
-printf("\nProcess : %d || PID = %d \n",pno++,k);
-pthread_mutex_unlock(&mutex);
-sleep(5);
-release(k,p);
-}
-
-int main()
-{
-int n,i;
-allocate_map();
-printf("Enter the number of process to start");
-scanf("%d",&n);
-pthread_t p[n];
-for(i=0;i<n;i++)
-{
- pthread_create(&p[i],NULL,display_thread,(void *)&n);
-}
-for(i=0;i<n;i++)
-{pthread_join(p[i],NULL);
-}
-return 0; 
 }
